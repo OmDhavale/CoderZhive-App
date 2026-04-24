@@ -1,5 +1,5 @@
 import React, { useContext, useEffect } from 'react';
-import { View, ActivityIndicator, StyleSheet, BackHandler, Platform } from 'react-native';
+import { View, ActivityIndicator, StyleSheet, BackHandler, Platform, StatusBar } from 'react-native';
 import { SafeAreaProvider, useSafeAreaInsets } from 'react-native-safe-area-context';
 import Toast from 'react-native-toast-message';
 
@@ -77,7 +77,8 @@ function RootNavigator() {
   };
 
   return (
-    <View style={[styles.container, { paddingTop: insets.top }]}>
+    <View style={styles.container}>
+      <StatusBar barStyle="light-content" />
       {renderScreen()}
     </View>
   );

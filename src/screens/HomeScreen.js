@@ -5,9 +5,11 @@ import {
   TouchableOpacity,
   StyleSheet,
   StatusBar,
-  SafeAreaView,
   Dimensions,
+  Image,
 } from 'react-native';
+import logo from '../../assets/coderzhive-dark.png';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { NavigationContext } from '../context/NavigationContext';
 import { useTheme } from '../context/ThemeContext';
 
@@ -16,38 +18,40 @@ const { width } = Dimensions.get('window');
 export default function HomeScreen() {
   const { navigate } = useContext(NavigationContext);
   const { darkMode, lightTheme, darkTheme, setTheme } = useTheme();
+  const insets = useSafeAreaInsets();
   const colors = darkMode ? darkTheme : lightTheme;
 
   return (
     <View style={styles.root}>
-      <StatusBar barStyle="light-content" backgroundColor="#0a1628" />
+      <StatusBar barStyle="light-content" />
+
+      {/* Seamless Status Bar Background */}
+      <View style={{ height: insets.top, backgroundColor: '#0a1628' }} />
 
       {/* ── Dark Hero Background ── */}
       <View style={styles.hero}>
 
         {/* Top bar */}
         <View style={styles.topBar}>
-          <View style={styles.logoBadge}>
-            <Text style={styles.logoBadgeText}>CZ</Text>
-          </View>
+          {/* <Image source={logo} style={styles.officialLogo} /> */}
           <TouchableOpacity
-            onPress={() => setTheme(!darkMode)}
             style={styles.themeToggle}
+            onPress={() => setTheme(!darkMode)}
           >
-            <View style={styles.themeToggleDot} />
+            <View style={[styles.themeToggleDot, { alignSelf: darkMode ? 'flex-end' : 'flex-start' }]} />
           </TouchableOpacity>
         </View>
 
         {/* Brand Block */}
         <View style={styles.brandBlock}>
-          <Text style={styles.brandName}>CoderZhive</Text>
+          <Image source={logo} style={styles.heroLogo} />
           <View style={styles.taglineRow}>
             <View style={styles.taglineAccent} />
-            <Text style={styles.taglineText}>NGO Attendance Platform</Text>
+            <Text style={styles.taglineText}>Developer Team Portal</Text>
           </View>
           <Text style={styles.brandDesc}>
-            Streamline volunteer management, event attendance and internship
-            tracking — all in one unified platform.
+            Centralized administration hub for CoderZhive's ecosystem of applications.
+            Manage project configurations, entity permissions, and system-wide analytics.
           </Text>
         </View>
 
@@ -62,10 +66,10 @@ export default function HomeScreen() {
       {/* ── Role Selection Panel ── */}
       <View style={[styles.panel, { backgroundColor: colors.backgroundColors?.[0] || '#f8fafc' }]}>
         <Text style={[styles.panelHeading, { color: colors.textSecondary }]}>
-          SELECT YOUR ROLE
+          ACTIVE PROJECTS
         </Text>
 
-        {/* NGO Admin Card */}
+        {/* Attendance Admin Card */}
         <TouchableOpacity
           style={[styles.roleCard, { backgroundColor: colors.cardBg, borderColor: colors.border }]}
           onPress={() => navigate('AdminLogin')}
@@ -84,9 +88,9 @@ export default function HomeScreen() {
           </View>
 
           <View style={styles.roleContent}>
-            <Text style={[styles.roleTitle, { color: colors.header }]}>NGO Admin</Text>
+            <Text style={[styles.roleTitle, { color: colors.header }]}>MarkIn App Admin</Text>
             <Text style={[styles.roleSubtitle, { color: colors.textSecondary }]}>
-              Manage colleges, NGOs, events and reports
+              Add colleges, ngos, admins
             </Text>
           </View>
 
@@ -95,8 +99,8 @@ export default function HomeScreen() {
           </View>
         </TouchableOpacity>
 
-        {/* Coming Soon cards */}
-        {['NGO Volunteer', 'College Coordinator', 'Student'].map((role) => (
+        {/* Other Projects Coming Soon
+        {['Event Manager', 'Resource Library', 'Team Connect'].map((role) => (
           <View
             key={role}
             style={[styles.roleCard, styles.roleCardDisabled, { backgroundColor: colors.cardBg, borderColor: colors.border }]}
@@ -105,18 +109,18 @@ export default function HomeScreen() {
             <View style={styles.roleContent}>
               <Text style={[styles.roleTitle, { color: colors.textSecondary, opacity: 0.5 }]}>{role}</Text>
               <Text style={[styles.roleSubtitle, { color: colors.textSecondary, opacity: 0.4 }]}>
-                Coming soon
+                Project Admin Dashboard
               </Text>
             </View>
             <View style={[styles.soonBadge, { backgroundColor: colors.border }]}>
-              <Text style={[styles.soonText, { color: colors.textSecondary }]}>SOON</Text>
+              <Text style={[styles.soonText, { color: colors.textSecondary }]}>OFFLINE</Text>
             </View>
           </View>
-        ))}
+        ))} */}
 
         {/* Footer */}
         <Text style={[styles.footerText, { color: colors.textSecondary }]}>
-          CoderZhive Platform &nbsp;·&nbsp; v1.0.0
+          CoderZhive Admin Console &nbsp;·&nbsp; v2.4.0
         </Text>
       </View>
     </View>
@@ -130,7 +134,7 @@ const styles = StyleSheet.create({
   hero: {
     backgroundColor: '#0a1628',
     paddingHorizontal: 24,
-    paddingTop: 16,
+    paddingTop: 16, // Reset to normal padding as safe area is now handled by a separate View
     paddingBottom: 40,
     overflow: 'hidden',
     position: 'relative',
@@ -141,19 +145,10 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     marginBottom: 36,
   },
-  logoBadge: {
-    width: 44,
+  officialLogo: {
+    width: 130,
     height: 44,
-    borderRadius: 12,
-    backgroundColor: '#0ea5e9',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  logoBadgeText: {
-    color: '#fff',
-    fontWeight: '900',
-    fontSize: 16,
-    letterSpacing: 0.5,
+    resizeMode: 'contain',
   },
   themeToggle: {
     width: 44,
@@ -170,7 +165,14 @@ const styles = StyleSheet.create({
     backgroundColor: '#0ea5e9',
     alignSelf: 'flex-end',
   },
-  brandBlock: { marginBottom: 8 },
+  brandBlock: { marginBottom: 12 },
+  heroLogo: {
+    width: 200,
+    height: 60,
+    resizeMode: 'contain',
+    marginLeft: -10, // Adjust for logo padding
+    marginBottom: 10,
+  },
   brandName: {
     color: '#ffffff',
     fontSize: 36,

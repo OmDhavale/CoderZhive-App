@@ -10,9 +10,11 @@ import {
     ActivityIndicator,
     StyleSheet,
     StatusBar,
-    SafeAreaView,
     KeyboardAvoidingView,
+    Image,
 } from "react-native";
+import logo from "../../../assets/coderzhive-dark.png";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { NavigationContext } from "../../context/NavigationContext";
 import { AuthContext } from "../../context/AuthContext";
 import { useTheme } from "../../context/ThemeContext";
@@ -26,6 +28,7 @@ export default function RegisterAdminScreen() {
     const { darkMode, lightTheme, darkTheme } = useTheme();
     const colors = darkMode ? darkTheme : lightTheme;
     const isDark = darkMode;
+    const insets = useSafeAreaInsets();
 
     const [currentAdminPassword, setCurrentAdminPassword] = useState("");
     const [username, setUsername] = useState("");
@@ -77,8 +80,8 @@ export default function RegisterAdminScreen() {
             const response = await fetch(api.registerAdmin, {
                 method: "POST",
                 credentials: "include",
-                headers: { 
-                    Accept: "application/json", 
+                headers: {
+                    Accept: "application/json",
                     "Content-Type": "application/json",
                     Authorization: `Bearer ${accessToken}`,
                 },
@@ -123,21 +126,24 @@ export default function RegisterAdminScreen() {
 
     return (
         <View style={[styles.root, { backgroundColor: isDark ? "#0a1628" : "#f8fafc" }]}>
-            <StatusBar barStyle="light-content" backgroundColor="#0a1628" />
+            <StatusBar barStyle="light-content" />
+
+            <View style={{ height: insets.top, backgroundColor: '#0a1628' }} />
 
             <View style={styles.header}>
-                <TouchableOpacity onPress={goBack} style={styles.backBtn}>
+                <TouchableOpacity onPress={() => goBack()} style={styles.backBtn}>
                     <View style={styles.backArrow} />
-                    <Text style={styles.backLabel}>Admin Panel</Text>
                 </TouchableOpacity>
-                <View style={styles.logoBadge}>
-                    <Text style={styles.logoBadgeText}>CZ</Text>
-                </View>
+                <Image source={logo} style={styles.officialLogo} />
+                {/* <View style={styles.headerTextWrap}>
+                    <Text style={styles.headerTitle}>New Administrator</Text>
+                    <Text style={styles.headerSubtitle}>Authorized project manager for CoderZhive</Text>
+                </View> */}
             </View>
 
             <KeyboardAvoidingView style={{ flex: 1 }} behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
                 <ScrollView contentContainerStyle={styles.scroll} showsVerticalScrollIndicator={false}>
-                    
+
                     <View style={[styles.infoBox, { backgroundColor: "#0ea5e910", borderColor: "#0ea5e930" }]}>
                         <Text style={styles.infoTitle}>SECURITY PROTOCOL</Text>
                         <Text style={[styles.infoText, { color: isDark ? "#7cb9e8" : "#0369a1" }]}>
@@ -149,7 +155,7 @@ export default function RegisterAdminScreen() {
                     <View style={[styles.card, { backgroundColor: isDark ? "#111c2d" : "#fff", borderColor: isDark ? "#1e3a5f" : "#e2e8f0" }]}>
                         <Text style={[styles.cardTitle, { color: isDark ? "#f1f5f9" : "#0f172a" }]}>Security Verification</Text>
                         <Text style={[styles.cardSubtitle, { color: isDark ? "#64748b" : "#94a3b8" }]}>Confirm your identity to proceed</Text>
-                        
+
                         <View style={styles.divider} />
 
                         <View style={styles.fieldGroup}>
@@ -171,7 +177,7 @@ export default function RegisterAdminScreen() {
                     <View style={[styles.card, { backgroundColor: isDark ? "#111c2d" : "#fff", borderColor: isDark ? "#1e3a5f" : "#e2e8f0", marginTop: 20 }]}>
                         <Text style={[styles.cardTitle, { color: isDark ? "#f1f5f9" : "#0f172a" }]}>New Account Details</Text>
                         <Text style={[styles.cardSubtitle, { color: isDark ? "#64748b" : "#94a3b8" }]}>Define credentials for the new administrator</Text>
-                        
+
                         <View style={styles.divider} />
 
                         <View style={styles.fieldGroup}>
@@ -269,15 +275,11 @@ const styles = StyleSheet.create({
         marginRight: 8,
     },
     backLabel: { color: "#64748b", fontSize: 14, fontWeight: "600" },
-    logoBadge: {
-        width: 36,
+    officialLogo: {
+        width: 100,
         height: 36,
-        borderRadius: 10,
-        backgroundColor: "#0ea5e9",
-        alignItems: "center",
-        justifyContent: "center",
+        resizeMode: "contain",
     },
-    logoBadgeText: { color: "#fff", fontWeight: "900", fontSize: 13 },
     scroll: { padding: 20, paddingBottom: 40 },
     infoBox: {
         padding: 16,

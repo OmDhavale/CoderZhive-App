@@ -7,11 +7,13 @@ import {
   ActivityIndicator,
   StyleSheet,
   StatusBar,
-  SafeAreaView,
   KeyboardAvoidingView,
   Platform,
   ScrollView,
+  Image,
 } from 'react-native';
+import logo from "../../../assets/coderzhive-dark.png";
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { NavigationContext } from '../../context/NavigationContext';
 import { AuthContext } from '../../context/AuthContext';
 import { useTheme } from '../../context/ThemeContext';
@@ -27,6 +29,7 @@ export default function AdminLoginScreen() {
   const { navigate, goBack } = useContext(NavigationContext);
   const { loginUser, switchUserType } = useContext(AuthContext);
   const { darkMode, lightTheme, darkTheme } = useTheme();
+  const insets = useSafeAreaInsets();
   const colors = darkMode ? darkTheme : lightTheme;
   const isDark = darkMode;
 
@@ -49,7 +52,7 @@ export default function AdminLoginScreen() {
         try {
           const errData = await response.json();
           if (errData?.message) errMsg = errData.message;
-        } catch {}
+        } catch { }
         throw new Error(errMsg);
       }
       const data = await response.json();
@@ -79,7 +82,10 @@ export default function AdminLoginScreen() {
 
   return (
     <View style={[styles.root, { backgroundColor: isDark ? '#0a1628' : '#f8fafc' }]}>
-      <StatusBar barStyle={isDark ? 'light-content' : 'dark-content'} />
+      <StatusBar barStyle="light-content" />
+      
+      {/* Seamless Status Bar Background */}
+      <View style={{ height: insets.top, backgroundColor: '#0a1628' }} />
 
       {/* Top strip */}
       <View style={[styles.topStrip, { backgroundColor: '#0a1628' }]}>
@@ -87,8 +93,8 @@ export default function AdminLoginScreen() {
           <View style={styles.backArrow} />
           <Text style={styles.backLabel}>Home</Text>
         </TouchableOpacity>
-        <View style={styles.logoBadge}>
-          <Text style={styles.logoBadgeText}>CZ</Text>
+        <View style={styles.brandContainer}>
+          <Image source={logo} style={styles.officialLogo} />
         </View>
       </View>
 
@@ -237,15 +243,11 @@ const styles = StyleSheet.create({
     marginRight: 8,
   },
   backLabel: { color: '#64748b', fontSize: 14, fontWeight: '600' },
-  logoBadge: {
-    width: 36,
-    height: 36,
-    borderRadius: 10,
-    backgroundColor: '#0ea5e9',
-    alignItems: 'center',
-    justifyContent: 'center',
+  officialLogo: {
+    width: 120,
+    height: 40,
+    resizeMode: "contain",
   },
-  logoBadgeText: { color: '#fff', fontWeight: '900', fontSize: 13, letterSpacing: 0.5 },
 
   scroll: { flexGrow: 1, paddingHorizontal: 20, paddingTop: 20, paddingBottom: 40 },
 

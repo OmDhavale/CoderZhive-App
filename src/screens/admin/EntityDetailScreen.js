@@ -7,9 +7,10 @@ import {
     Image,
     StyleSheet,
     StatusBar,
-    SafeAreaView,
     Dimensions,
 } from "react-native";
+import logo from "../../../assets/coderzhive-dark.png";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { NavigationContext } from "../../context/NavigationContext";
 import { useTheme } from "../../context/ThemeContext";
 
@@ -18,6 +19,7 @@ const { width } = Dimensions.get("window");
 export default function EntityDetailScreen({ entity, entityType }) {
     const { goBack } = useContext(NavigationContext);
     const { darkMode, lightTheme, darkTheme } = useTheme();
+    const insets = useSafeAreaInsets();
     const colors = darkMode ? darkTheme : lightTheme;
     const isDark = darkMode;
 
@@ -53,14 +55,20 @@ export default function EntityDetailScreen({ entity, entityType }) {
 
     return (
         <View style={[styles.root, { backgroundColor: isDark ? "#0a1628" : "#f8fafc" }]}>
-            <StatusBar barStyle="light-content" backgroundColor="#0a1628" />
+            <StatusBar barStyle="light-content" />
+            
+            {/* Seamless Status Bar Background */}
+            <View style={{ height: insets.top, backgroundColor: '#0a1628' }} />
 
             {/* Header / Profile Hero */}
             <View style={styles.hero}>
-                <TouchableOpacity onPress={goBack} style={styles.backBtn}>
-                    <View style={styles.backArrow} />
-                    <Text style={styles.backLabel}>Go Back</Text>
-                </TouchableOpacity>
+                <View style={styles.topNav}>
+                    <TouchableOpacity onPress={goBack} style={styles.backBtn}>
+                        <View style={styles.backArrow} />
+                        <Text style={styles.backLabel}>Go Back</Text>
+                    </TouchableOpacity>
+                    <Image source={logo} style={styles.officialLogo} />
+                </View>
 
                 <View style={styles.profileSection}>
                     <View style={[styles.avatarWrap, { backgroundColor: "#0ea5e915", borderColor: "#0ea5e930" }]}>
@@ -154,7 +162,18 @@ const styles = StyleSheet.create({
         borderBottomLeftRadius: 32,
         borderBottomRightRadius: 32,
     },
-    backBtn: { flexDirection: "row", alignItems: "center", marginBottom: 24 },
+    topNav: {
+        flexDirection: "row",
+        alignItems: "center",
+        justifyContent: "space-between",
+        marginBottom: 24,
+    },
+    officialLogo: {
+        width: 100,
+        height: 36,
+        resizeMode: "contain",
+    },
+    backBtn: { flexDirection: "row", alignItems: "center" },
     backArrow: {
         width: 8,
         height: 8,

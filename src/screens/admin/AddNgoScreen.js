@@ -10,10 +10,11 @@ import {
   Alert,
   StyleSheet,
   StatusBar,
-  SafeAreaView,
   KeyboardAvoidingView,
   ActivityIndicator,
 } from "react-native";
+import logo from "../../../assets/coderzhive-dark.png";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 import * as ImagePicker from "expo-image-picker";
 import { NavigationContext } from "../../context/NavigationContext";
 import { AuthContext } from "../../context/AuthContext";
@@ -27,6 +28,7 @@ export default function AddNgoScreen() {
   const { darkMode, lightTheme, darkTheme } = useTheme();
   const colors = darkMode ? darkTheme : lightTheme;
   const isDark = darkMode;
+  const insets = useSafeAreaInsets();
 
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
@@ -143,17 +145,18 @@ export default function AddNgoScreen() {
 
   return (
     <View style={[styles.root, { backgroundColor: isDark ? "#0a1628" : "#f8fafc" }]}>
-      <StatusBar barStyle="light-content" backgroundColor="#0a1628" />
+      <StatusBar barStyle="light-content" />
+      
+      {/* Seamless Status Bar Background */}
+      <View style={{ height: insets.top, backgroundColor: '#0a1628' }} />
 
       {/* Header */}
       <View style={styles.header}>
         <TouchableOpacity onPress={goBack} style={styles.backBtn}>
           <View style={styles.backArrow} />
-          <Text style={styles.backLabel}>Admin Panel</Text>
         </TouchableOpacity>
-        <View style={styles.logoBadge}>
-          <Text style={styles.logoBadgeText}>CZ</Text>
-        </View>
+        <Image source={logo} style={styles.officialLogo} />
+        <View style={styles.logoBadgePlaceholder} />
       </View>
 
       <KeyboardAvoidingView style={{ flex: 1 }} behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
@@ -301,15 +304,12 @@ const styles = StyleSheet.create({
     marginRight: 8,
   },
   backLabel: { color: "#64748b", fontSize: 14, fontWeight: "600" },
-  logoBadge: {
-    width: 36,
+  officialLogo: {
+    width: 100,
     height: 36,
-    borderRadius: 10,
-    backgroundColor: "#0ea5e9",
-    alignItems: "center",
-    justifyContent: "center",
+    resizeMode: "contain",
   },
-  logoBadgeText: { color: "#fff", fontWeight: "900", fontSize: 13 },
+  logoBadgePlaceholder: { width: 36 },
   scroll: { padding: 20, paddingBottom: 40 },
   card: {
     borderRadius: 24,

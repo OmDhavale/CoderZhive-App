@@ -3,22 +3,23 @@ import {
   View,
   Text,
   TouchableOpacity,
-  ActivityIndicator,
   ScrollView,
+  StyleSheet,
+  StatusBar,
+  Dimensions,
+  ActivityIndicator,
   TextInput,
   Image,
   Platform,
-  StyleSheet,
-  StatusBar,
-  SafeAreaView,
-  Dimensions,
 } from "react-native";
+import { SafeAreaView, useSafeAreaInsets } from "react-native-safe-area-context";
 import { AttendanceContext } from "../../context/AttendanceContext";
 import { NavigationContext } from "../../context/NavigationContext";
 import { AuthContext } from "../../context/AuthContext";
 import { useTheme } from "../../context/ThemeContext";
 import Toast from "react-native-toast-message";
 import * as api from "../../../apis/api";
+import logo from "../../../assets/coderzhive-dark.png";
 
 const { width } = Dimensions.get("window");
 
@@ -29,6 +30,7 @@ export default function AdminPanelScreen() {
   const { darkMode, lightTheme, darkTheme } = useTheme();
   const colors = darkMode ? darkTheme : lightTheme;
   const isDark = darkMode;
+  const insets = useSafeAreaInsets();
 
   const [collegesList, setCollegesList] = useState([]);
   const [ngosList, setNgosList] = useState([]);
@@ -189,22 +191,20 @@ export default function AdminPanelScreen() {
 
   return (
     <View style={[styles.root, { backgroundColor: isDark ? "#0a1628" : "#f8fafc" }]}>
-      <StatusBar barStyle="light-content" backgroundColor="#0a1628" />
+      <StatusBar barStyle="light-content" />
+
+      {/* Seamless Status Bar Background */}
+      <View style={{ height: insets.top, backgroundColor: '#0a1628' }} />
 
       {/* Header Section */}
-      <View style={styles.header}>
+      <View style={styles.headerHero}>
         <View style={styles.headerTop}>
-          <View style={styles.logoBadge}>
-            <Text style={styles.logoBadgeText}>CZ</Text>
-          </View>
-          <View style={styles.headerTitleWrap}>
-            <Text style={styles.headerTitle}>Admin Panel</Text>
-            <Text style={styles.headerSubtitle}>System Governance</Text>
-          </View>
-          <TouchableOpacity onPress={handleLogout} style={styles.logoutBtn}>
-            <Text style={styles.logoutBtnText}>Exit</Text>
+          <Image source={logo} style={styles.officialLogo} />
+          <TouchableOpacity onPress={logout} style={styles.logoutBtn}>
+            <Text style={styles.logoutBtnText}>LOGOUT</Text>
           </TouchableOpacity>
         </View>
+
 
         <View style={styles.statsContainer}>
           <View style={styles.statsCard}>
@@ -215,7 +215,7 @@ export default function AdminPanelScreen() {
             <Text style={styles.statsLabel}>NGOs</Text>
             <Text style={styles.statsValue}>{ngosList.length}</Text>
           </View>
-          <TouchableOpacity 
+          <TouchableOpacity
             onPress={() => navigate("RegisterAdmin")}
             style={styles.addAdminBtn}
           >
@@ -224,7 +224,7 @@ export default function AdminPanelScreen() {
         </View>
       </View>
 
-      <ScrollView 
+      <ScrollView
         style={styles.content}
         showsVerticalScrollIndicator={false}
         contentContainerStyle={{ paddingBottom: 40 }}
@@ -233,7 +233,7 @@ export default function AdminPanelScreen() {
         <View style={styles.section}>
           <View style={styles.sectionHeader}>
             <Text style={[styles.sectionTitle, { color: isDark ? "#94a3b8" : "#475569" }]}>COLLEGES</Text>
-            <TouchableOpacity 
+            <TouchableOpacity
               onPress={() => navigate("AddCollege")}
               style={styles.addBtn}
             >
@@ -268,7 +268,7 @@ export default function AdminPanelScreen() {
         <View style={styles.section}>
           <View style={styles.sectionHeader}>
             <Text style={[styles.sectionTitle, { color: isDark ? "#94a3b8" : "#475569" }]}>NGOs</Text>
-            <TouchableOpacity 
+            <TouchableOpacity
               onPress={() => navigate("AddNgo")}
               style={styles.addBtn}
             >
@@ -305,7 +305,7 @@ export default function AdminPanelScreen() {
 
 const styles = StyleSheet.create({
   root: { flex: 1 },
-  header: {
+  headerHero: {
     backgroundColor: "#0a1628",
     paddingTop: 10,
     paddingBottom: 20,
@@ -316,20 +316,13 @@ const styles = StyleSheet.create({
   headerTop: {
     flexDirection: "row",
     alignItems: "center",
+    justifyContent: "space-between",
     marginBottom: 20,
   },
-  logoBadge: {
-    width: 40,
+  officialLogo: {
+    width: 120,
     height: 40,
-    borderRadius: 10,
-    backgroundColor: "#0ea5e9",
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  logoBadgeText: {
-    color: "#fff",
-    fontWeight: "900",
-    fontSize: 14,
+    resizeMode: "contain",
   },
   headerTitleWrap: {
     flex: 1,
@@ -340,12 +333,20 @@ const styles = StyleSheet.create({
     fontSize: 20,
     fontWeight: "900",
   },
-  headerSubtitle: {
+  headerInfo: {
+    marginBottom: 20,
+  },
+  headerGreeting: {
+    color: "#fff",
+    fontSize: 24,
+    fontWeight: "900",
+  },
+  headerSub: {
     color: "#0ea5e9",
-    fontSize: 11,
+    fontSize: 12,
     fontWeight: "700",
-    letterSpacing: 1,
     textTransform: "uppercase",
+    letterSpacing: 1,
   },
   logoutBtn: {
     paddingHorizontal: 12,

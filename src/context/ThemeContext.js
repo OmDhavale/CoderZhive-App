@@ -59,8 +59,9 @@ export function ThemeProvider({ children }) {
 
   const setTheme = useCallback(async (value) => {
     try {
-      setDarkMode(Boolean(value));
-      await AsyncStorage.setItem(THEME_KEY, value ? 'dark' : 'light');
+      const isDark = value === 'dark' || value === true;
+      setDarkMode(isDark);
+      await AsyncStorage.setItem(THEME_KEY, isDark ? 'dark' : 'light');
     } catch (e) {
       console.warn('Failed to save theme', e);
     }
