@@ -20,12 +20,13 @@ import { useTheme } from "../../context/ThemeContext";
 import Toast from "react-native-toast-message";
 import * as api from "../../../apis/api";
 import logo from "../../../assets/coderzhive-dark.png";
+import { Building2, Heart, Plus } from "lucide-react-native";
 
 const { width } = Dimensions.get("window");
 
 export default function AdminPanelScreen() {
   const { addCollege, addNgo } = useContext(AttendanceContext);
-  const { navigate } = useContext(NavigationContext);
+  const { navigate, replace } = useContext(NavigationContext);
   const { logout } = useContext(AuthContext);
   const { darkMode, lightTheme, darkTheme } = useTheme();
   const colors = darkMode ? darkTheme : lightTheme;
@@ -40,6 +41,7 @@ export default function AdminPanelScreen() {
   const [ngoSearch, setNgoSearch] = useState("");
   const [selectedEntity, setSelectedEntity] = useState(null);
   const [entityType, setEntityType] = useState(null);
+  const [activeTab, setActiveTab] = useState("colleges"); // "colleges" or "ngos"
 
   useEffect(() => {
     fetchNgos();
@@ -87,8 +89,11 @@ export default function AdminPanelScreen() {
       }
 
       const data = await response.json();
-      const ngosArray = data.statusCode || data.ngos || data.data || [];
-      setNgosList(Array.isArray(ngosArray) ? ngosArray : []);
+      let ngosArray = [];
+      if (Array.isArray(data)) ngosArray = data;
+      else if (data.data && Array.isArray(data.data)) ngosArray = data.data;
+      else if (data.ngos && Array.isArray(data.ngos)) ngosArray = data.ngos;
+      setNgosList(ngosArray);
     } catch (err) {
       console.error("Error fetching NGOs:", err);
     } finally {
@@ -98,7 +103,7 @@ export default function AdminPanelScreen() {
 
   const handleLogout = async () => {
     await logout();
-    navigate("Home");
+    replace('Home'); // Reset entire nav history → prevents back-navigation into authenticated area
   };
 
   const handleEditComingSoon = (type) => {
@@ -200,7 +205,7 @@ export default function AdminPanelScreen() {
       <View style={styles.headerHero}>
         <View style={styles.headerTop}>
           <Image source={logo} style={styles.officialLogo} />
-          <TouchableOpacity onPress={logout} style={styles.logoutBtn}>
+          <TouchableOpacity onPress={handleLogout} style={styles.logoutBtn}>
             <Text style={styles.logoutBtnText}>LOGOUT</Text>
           </TouchableOpacity>
         </View>
@@ -227,78 +232,93 @@ export default function AdminPanelScreen() {
       <ScrollView
         style={styles.content}
         showsVerticalScrollIndicator={false}
-        contentContainerStyle={{ paddingBottom: 40 }}
+        contentContainerStyle={{ paddingBottom: 100 }}
       >
-        {/* Colleges Section */}
-        <View style={styles.section}>
-          <View style={styles.sectionHeader}>
-            <Text style={[styles.sectionTitle, { color: isDark ? "#94a3b8" : "#475569" }]}>COLLEGES</Text>
-            <TouchableOpacity
-              onPress={() => navigate("AddCollege")}
-              style={styles.addBtn}
-            >
-              <Text style={styles.addBtnText}>+ Add New</Text>
-            </TouchableOpacity>
-          </View>
-
-          <View style={[styles.searchWrap, { backgroundColor: isDark ? "#111c2d" : "#fff", borderColor: isDark ? "#1e3a5f" : "#e2e8f0" }]}>
-            <TextInput
-              style={[styles.searchInput, { color: isDark ? "#fff" : "#1e293b" }]}
-              placeholder="Search by name..."
-              placeholderTextColor={isDark ? "#334a5e" : "#94a3b8"}
-              value={collegeSearch}
-              onChangeText={setCollegeSearch}
-            />
-          </View>
-
-          {loadingColleges ? (
-            <ActivityIndicator color="#0ea5e9" style={{ marginVertical: 20 }} />
-          ) : filteredColleges.length > 0 ? (
-            <View style={styles.entityList}>
-              {filteredColleges.map((item) => renderEntityItem(item, "college"))}
+        {activeTab === "colleges" ? (
+          <View style={styles.section}>
+            <View style={styles.sectionHeader}>
+              <Text style={[styles.sectionTitle, { color: isDark ? "#94a3b8" : "#475569" }]}>COLLEGES</Text>
             </View>
-          ) : (
-            <View style={styles.emptyState}>
-              <Text style={styles.emptyText}>No colleges found</Text>
-            </View>
-          )}
-        </View>
 
-        {/* NGOs Section */}
-        <View style={styles.section}>
-          <View style={styles.sectionHeader}>
-            <Text style={[styles.sectionTitle, { color: isDark ? "#94a3b8" : "#475569" }]}>NGOs</Text>
-            <TouchableOpacity
-              onPress={() => navigate("AddNgo")}
-              style={styles.addBtn}
-            >
-              <Text style={styles.addBtnText}>+ Add New</Text>
-            </TouchableOpacity>
+            <View style={[styles.searchWrap, { backgroundColor: isDark ? "#111c2d" : "#fff", borderColor: isDark ? "#1e3a5f" : "#e2e8f0" }]}>
+              <TextInput
+                style={[styles.searchInput, { color: isDark ? "#fff" : "#1e293b" }]}
+                placeholder="Search by name..."
+                placeholderTextColor={isDark ? "#334a5e" : "#94a3b8"}
+                value={collegeSearch}
+                onChangeText={setCollegeSearch}
+              />
+            </View>
+
+            {loadingColleges ? (
+              <ActivityIndicator color="#0ea5e9" style={{ marginVertical: 20 }} />
+            ) : filteredColleges.length > 0 ? (
+              <View style={styles.entityList}>
+                {filteredColleges.map((item) => renderEntityItem(item, "college"))}
+              </View>
+            ) : (
+              <View style={styles.emptyState}>
+                <Text style={styles.emptyText}>No colleges found</Text>
+              </View>
+            )}
           </View>
+        ) : (
+          <View style={styles.section}>
+            <View style={styles.sectionHeader}>
+              <Text style={[styles.sectionTitle, { color: isDark ? "#94a3b8" : "#475569" }]}>NGOs</Text>
+            </View>
 
-          <View style={[styles.searchWrap, { backgroundColor: isDark ? "#111c2d" : "#fff", borderColor: isDark ? "#1e3a5f" : "#e2e8f0" }]}>
-            <TextInput
-              style={[styles.searchInput, { color: isDark ? "#fff" : "#1e293b" }]}
-              placeholder="Search by name..."
-              placeholderTextColor={isDark ? "#334a5e" : "#94a3b8"}
-              value={ngoSearch}
-              onChangeText={setNgoSearch}
-            />
+            <View style={[styles.searchWrap, { backgroundColor: isDark ? "#111c2d" : "#fff", borderColor: isDark ? "#1e3a5f" : "#e2e8f0" }]}>
+              <TextInput
+                style={[styles.searchInput, { color: isDark ? "#fff" : "#1e293b" }]}
+                placeholder="Search by name..."
+                placeholderTextColor={isDark ? "#334a5e" : "#94a3b8"}
+                value={ngoSearch}
+                onChangeText={setNgoSearch}
+              />
+            </View>
+
+            {loadingNgos ? (
+              <ActivityIndicator color="#0ea5e9" style={{ marginVertical: 20 }} />
+            ) : filteredNgos.length > 0 ? (
+              <View style={styles.entityList}>
+                {filteredNgos.map((item) => renderEntityItem(item, "ngo"))}
+              </View>
+            ) : (
+              <View style={styles.emptyState}>
+                <Text style={styles.emptyText}>No NGOs found</Text>
+              </View>
+            )}
           </View>
-
-          {loadingNgos ? (
-            <ActivityIndicator color="#0ea5e9" style={{ marginVertical: 20 }} />
-          ) : filteredNgos.length > 0 ? (
-            <View style={styles.entityList}>
-              {filteredNgos.map((item) => renderEntityItem(item, "ngo"))}
-            </View>
-          ) : (
-            <View style={styles.emptyState}>
-              <Text style={styles.emptyText}>No NGOs found</Text>
-            </View>
-          )}
-        </View>
+        )}
       </ScrollView>
+
+      {/* Floating Action Button */}
+      <TouchableOpacity
+        style={styles.fab}
+        onPress={() => activeTab === "colleges" ? navigate("AddCollege") : navigate("AddNgo")}
+      >
+        <Plus color="#fff" size={28} />
+      </TouchableOpacity>
+
+      {/* Bottom Navbar */}
+      <View style={[styles.bottomNav, { backgroundColor: isDark ? "#111c2d" : "#ffffff", borderTopColor: isDark ? "#1e3a5f" : "#e2e8f0" }]}>
+        <TouchableOpacity
+          style={styles.navItem}
+          onPress={() => setActiveTab("colleges")}
+        >
+          <Building2 color={activeTab === "colleges" ? "#0ea5e9" : (isDark ? "#64748b" : "#94a3b8")} size={24} />
+          <Text style={[styles.navText, { color: activeTab === "colleges" ? "#0ea5e9" : (isDark ? "#64748b" : "#94a3b8") }]}>Colleges</Text>
+        </TouchableOpacity>
+
+        <TouchableOpacity
+          style={styles.navItem}
+          onPress={() => setActiveTab("ngos")}
+        >
+          <Heart color={activeTab === "ngos" ? "#0ea5e9" : (isDark ? "#64748b" : "#94a3b8")} size={24} />
+          <Text style={[styles.navText, { color: activeTab === "ngos" ? "#0ea5e9" : (isDark ? "#64748b" : "#94a3b8") }]}>NGOs</Text>
+        </TouchableOpacity>
+      </View>
     </View>
   );
 }
@@ -510,5 +530,41 @@ const styles = StyleSheet.create({
     color: "#64748b",
     fontSize: 13,
     fontStyle: "italic",
+  },
+  fab: {
+    position: "absolute",
+    bottom: 90, // Above bottom nav
+    right: 20,
+    width: 60,
+    height: 60,
+    borderRadius: 30,
+    backgroundColor: "#0ea5e9",
+    justifyContent: "center",
+    alignItems: "center",
+    shadowColor: "#0ea5e9",
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.35,
+    shadowRadius: 8,
+    elevation: 6,
+    zIndex: 10,
+  },
+  bottomNav: {
+    flexDirection: "row",
+    height: Platform.OS === "ios" ? 90 : 70, // Handle iOS home indicator
+    borderTopWidth: 1,
+    paddingBottom: Platform.OS === "ios" ? 20 : 0,
+    alignItems: "center",
+    justifyContent: "space-around",
+  },
+  navItem: {
+    flex: 1,
+    alignItems: "center",
+    justifyContent: "center",
+    paddingVertical: 10,
+  },
+  navText: {
+    fontSize: 11,
+    fontWeight: "700",
+    marginTop: 4,
   },
 });

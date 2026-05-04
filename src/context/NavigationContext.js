@@ -8,8 +8,14 @@ export default function NavigationProvider({ children }) {
 
   const current = history[history.length - 1];
 
+  // Push a new route onto the stack
   function navigate(name, params) {
     setHistory(prev => [...prev, { name, params: params || {} }]);
+  }
+
+  // Replace the entire history with a single route (prevents going back)
+  function replace(name, params) {
+    setHistory([{ name, params: params || {} }]);
   }
 
   function goBack() {
@@ -21,7 +27,7 @@ export default function NavigationProvider({ children }) {
   }
 
   return (
-    <NavigationContext.Provider value={{ route: current, navigate, goBack }}>
+    <NavigationContext.Provider value={{ route: current, navigate, replace, goBack, history }}>
       {children}
     </NavigationContext.Provider>
   );

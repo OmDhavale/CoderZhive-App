@@ -12,6 +12,7 @@ import {
   StatusBar,
   KeyboardAvoidingView,
   ActivityIndicator,
+  Switch,
 } from "react-native";
 import logo from "../../../assets/coderzhive-dark.png";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
@@ -37,6 +38,7 @@ export default function AddNgoScreen() {
   const [mobile, setMobile] = useState("");
   const [reg, setReg] = useState("");
   const [logo, setLogo] = useState(null);
+  const [isHierarchical, setIsHierarchical] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [focusedField, setFocusedField] = useState(null);
 
@@ -77,6 +79,7 @@ export default function AddNgoScreen() {
     formData.append("password", password);
     formData.append("mobile", mobile);
     formData.append("registrationNumber", reg);
+    formData.append("is_hierarchical", isHierarchical ? 'true' : 'false');
 
     let filename = logo.split('/').pop();
     if (!filename || filename.indexOf('.') === -1) {
@@ -262,6 +265,19 @@ export default function AddNgoScreen() {
                 secureTextEntry
                 onFocus={() => setFocusedField('password')}
                 onBlur={() => setFocusedField(null)}
+              />
+            </View>
+
+            <View style={[styles.fieldGroup, { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', padding: 12, borderRadius: 14, borderWidth: 1.5, borderColor: isDark ? "#2a3a4a" : "#e2e8f0", backgroundColor: isDark ? "#1a2a3a" : "#f1f5f9" }]}>
+              <View>
+                <Text style={[styles.label, { color: isDark ? "#f1f5f9" : "#0f172a", marginBottom: 2, fontSize: 13 }]}>HIERARCHICAL NGO</Text>
+                <Text style={{ color: isDark ? "#94a3b8" : "#475569", fontSize: 10 }}>Enable multi-branch management</Text>
+              </View>
+              <Switch
+                value={isHierarchical}
+                onValueChange={setIsHierarchical}
+                trackColor={{ false: "#767577", true: "#0ea5e9" }}
+                thumbColor={isHierarchical ? "#fff" : "#f4f3f4"}
               />
             </View>
 

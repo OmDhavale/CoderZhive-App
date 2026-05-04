@@ -26,7 +26,7 @@ export default function AdminLoginScreen() {
   const [showPassword, setShowPassword] = useState(false);
   const [focusedField, setFocusedField] = useState(null);
 
-  const { navigate, goBack } = useContext(NavigationContext);
+  const { navigate, goBack, replace } = useContext(NavigationContext);
   const { loginUser, switchUserType } = useContext(AuthContext);
   const { darkMode, lightTheme, darkTheme } = useTheme();
   const insets = useSafeAreaInsets();
@@ -61,7 +61,7 @@ export default function AdminLoginScreen() {
       const refreshToken = responseData.refreshToken;
       const userData = responseData.user || { email };
       await loginUser(userData, accessToken, refreshToken, 'admin');
-      navigate('AdminPanel');
+      replace('AdminPanel'); // Clear history → back button cannot return to Login
     } catch (err) {
       alert('Login failed: ' + err.message);
     } finally {
